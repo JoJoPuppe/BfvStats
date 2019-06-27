@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+    <script src="/static/jquery-3.4.1.min.js"></script>
+    <style>
+
+    .cellchart{
+    	  background-image: linear-gradient(to right, #60dbbc 0%, #60dbbc 100%);
+		  background-position: bottom left;
+		  background-repeat: no-repeat;
+    }
+    .cellpercent {
+
+    	  float: left;
+    	  width:30px;
+    	  font-size: 10px;
+    	  position: relative;
+    	  bottom: -18px;
+    	  left: -5px;
+    }
+   	.best{
+   		position: relative;
+    	  bottom: 18px;
+    	  font-size: 12px;
+    	  color: #FFBB11;
+
+   	}
+
+  /* don't remove */
+	
+	.cellcontend{
+		float: left;
+	}
+	.bestDiv{
+
+	}
+
+    </style>
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+    <script>
+     $(document).ready(function(){
+
+			 	//$('td[style*="background-size: 3% 100.0%"]').prepend('<span class="icon best"><i class="fas fa-trophy"></i></span>');
+			 	$('div[class*="cellpercent"]:contains("100%")').parent().css("background-size", "0% 0%");
+			 	$('div[class*="cellpercent"]:contains("100%")').replaceWith('<div class="cellpercent bestDiv"></div>');
+			 	$('div[class*="cellpercent bestDiv"]').prepend('<span class="icon best"><i class="fas fa-trophy"></i></span>');
+
+
+
+			 	
+				
+				var i;
+
+				$('.skill').each(function(i, obj)  {
+					gesPts = 0;
+					$('#PStats td:nth-child('+(((i+1)*2)+1)+')').each(function(i, obj) {
+
+						$(this).css({"color":"#999999","font-size":"13px"});
+						
+    					gesPts += parseInt($( this ).text());
+    					if(parseInt($( this ).text()) > 0){
+    						var text = $(this).text();
+    						$(this).text("+"+ text); 
+    					}
+    					
+    					console.log(gesPts);
+					});
+
+					$(this).replaceWith('<td colspan="2" style="background-size: 0% 0%; text-align: right"><strong>'+gesPts+'</strong></td>');
+ 				
+				});
+	 	
+
+	});
+
+    function openTab(evt, tabName) {
+			  var i, x, tablinks;
+			  x = document.getElementsByClassName("content-tab");
+			  for (i = 0; i < x.length; i++) {
+			      x[i].style.display = "none";
+			  }
+			  tablinks = document.getElementsByClassName("tab");
+			  for (i = 0; i < x.length; i++) {
+			      tablinks[i].className = tablinks[i].className.replace(" is-active", "");
+			  }
+			  document.getElementById(tabName).style.display = "block";
+			  evt.currentTarget.className += " is-active";}
+
+			
+    		
+			
+
+			</script>
+  	</head>
+    <body>
+    <section class="hero is-primary">
+	  <div class="hero-body">
+	    <div class="container">
+	      <h1 class="title">
+	        Weekly BFV Stats
+	      </h1>
+	      <h2 class="subtitle">
+	        See your weekly Stats compared to other <strong>Players</strong>
+	      </h2>
+	    </div>
+	  </div>
+	</section>
+    <section class="section">
+    	<div class="container">
+    	<div class="tabs is-boxed">
+			  <ul>
+			    <li class="tab is-active" onclick="openTab(event,'CoreStats')" >
+			      <a>
+			        <span class="icon is-small"><i class="fas fa-image" aria-hidden="true"></i></span>
+			        <span>Core Stats</span>
+			      </a>
+			    </li>
+			    <li class="tab" onclick="openTab(event,'DetailedStats')" >
+			      <a>
+			        <span class="icon is-small"><i class="fas fa-image" aria-hidden="true"></i></span>
+			        <span>Detailed Stats</span>
+			      </a>
+			    </li>
+			     <li class="tab" onclick="openTab(event,'PerformanceStats')" >
+			      <a>
+			        <span class="icon is-small"><i class="fas fa-image" aria-hidden="true"></i></span>
+			        <span>Performace / Skill</span>
+			      </a>
+			    </li>
+			    <li class ="tab" onclick="openTab(event,'Firestorm')">
+			      <a>
+			        <span class="icon is-small"><i class="fas fa-music" aria-hidden="true"></i></span>
+			        <span>FireStorm</span>
+			      </a>
+			    </li>
+			  </ul>
+		</div>
+    		<h4 class="title is-4">Welcome to week {{WeeklyStats[0][0]['KW']|e}} </h4>
+    		<h5 class="subtitle is-5">({{WeekStartEnd[0] ~ " / " ~ WeekStartEnd[1]}})</h5>
+
+
+    	<div id="CoreStats" class="content-tab" >
+	        <table class="table is-hoverable">
+	       		<tr>
+	        		<th><span class="icon">
+  					<i class="fas fa-home"></i>
+					</span>Player</th>
+	        		{% for player in WeeklyStats %}
+	        			
+	        		<td  colspan="2"><strong>{{ player[0]['playerName'] }}</strong></td>
+
+	        		{% endfor %}
+	        	</tr>        	
+	        	
+	        	<tr><th><span class="icon">
+					<i class="fas fa-clock"></i>
+					</span>Play Time</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<!--{{ (WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed']) // 60,  }}-->
+	        		<td  colspan="2">{{"%i:%i:%i"|format( (WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed'])//3600, (WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed']) %3600//60,(WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed'])%60)}}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-crosshairs"></i>
+	        		</span>Kills</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+	        		
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['Kills'] ~ "%" }}'>
+	        			<div class="cellpercent" >{{ percentDict[i]['Kills']|int ~ "%" }}</div>
+	        		</td>
+	        		<td class="pt">
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-skull"></i>
+	        		</span>Deaths</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['Deaths'] ~ "%" }} '>
+	        			<div class="cellpercent" >{{ percentDict[i]['Deaths']|int ~ "%" }}</div>
+	        		</td>
+	        		<td class="pt">
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-skull"></i>
+	        		</span>K/D</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 0% 0%'>
+	        		</td>
+	        		<td >{{'%0.3f'| format((WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills']) / (WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']) if ((WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']) != 0) else 1 |float)}}</td>
+
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-trophy"></i>
+	        		</span>Wins</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['Wins'] ~ "%" }} '>
+	        			<div class="cellpercent" >{{ percentDict[i]['Wins']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['Wins'] - BaseStats[i][0]['Wins']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-times"></i>
+	        		</span>Losses</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['Losses'] ~ "%" }} '>
+	        			<div class="cellpercent" >{{ percentDict[i]['Losses']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['Losses'] - BaseStats[i][0]['Losses']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>Damage</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['Damage'] ~ "%" }} '>
+	        			<div class="cellpercent" >{{ percentDict[i]['Damage']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['Damage'] - BaseStats[i][0]['Damage']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bullseye"></i>
+	        		</span>Accuracy</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+	        		<td class="cellchart" style='background-size: 0% 0%'>
+	        		</td>
+	        		<td >{{'%0.2f'| format((WeeklyStats[i][0]['ShotsHit'] - BaseStats[i][0]['ShotsHit']) / (WeeklyStats[i][0]['ShotsTaken'] - BaseStats[i][0]['ShotsTaken'])*100 if ((WeeklyStats[i][0]['ShotsTaken'] - BaseStats[i][0]['ShotsTaken']) != 0) else 100|float ) ~ "%"}}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>Headshots</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['Headshots'] ~ "%" }}'>
+	        			<div class="cellpercent" >{{ percentDict[i]['Headshots']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['Headshots'] - BaseStats[i][0]['Headshots']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>Headshot %</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 0% 0%'>
+	        		</td>
+	        		<td>{{ '%0.2f'| format((WeeklyStats[i][0]['Headshots'] - BaseStats[i][0]['Headshots']) / ( WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills'] )*100) ~ "%"}}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-syringe"></i>
+	        		</span>Revives</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['Revives'] ~ "%" }} '>
+	        			<div class="cellpercent" >{{ percentDict[i]['Revives']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['Revives'] - BaseStats[i][0]['Revives']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-prescription-bottle-alt"></i>
+	        		</span>Heals</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['Heals'] ~ "%" }}'>
+	        			<div class="cellpercent" >{{ percentDict[i]['Heals']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['Heals'] - BaseStats[i][0]['Heals']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-box-open"></i>
+	        		</span>Resupplies</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['Resupplies'] ~ "%" }}'>
+	        			<div class="cellpercent" >{{ percentDict[i]['Resupplies']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['Resupplies'] - BaseStats[i][0]['Resupplies']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-user"></i>
+	        		</span>Spawns</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['SquadSpawns'] ~ "%" }} '>
+	        			<div class="cellpercent" >{{ percentDict[i]['SquadSpawns']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['SquadSpawns'] - BaseStats[i][0]['SquadSpawns']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-check-square"></i>
+	        		</span>Orders</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['OrdersCompleted'] ~ "%" }} '>
+	        			<div class="cellpercent" >{{ percentDict[i]['OrdersCompleted']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['OrdersCompleted'] - BaseStats[i][0]['OrdersCompleted']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-undo-alt"></i>
+	        		</span>Rounds</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['RoundsPlayed'] ~ "%" }} '>
+	        			<div class="cellpercent" >{{ percentDict[i]['RoundsPlayed']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['RoundsPlayed'] - BaseStats[i][0]['RoundsPlayed']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	       
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-dollar-sign"></i>
+	        		</span>Score</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td class="cellchart" style='background-size: 6% {{ percentDict[i]['ScoreRound'] ~ "%" }}'>
+	        			<div class="cellpercent" >{{ percentDict[i]['ScoreRound']|int ~ "%" }}</div>
+	        		</td>
+	        		<td>
+	        			<div class="cellcontend">{{ WeeklyStats[i][0]['ScoreRound'] - BaseStats[i][0]['ScoreRound']  }}</div>
+	        		</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+        	</table>
+        </div>
+        <div id="DetailedStats" class="content-tab" style="display:none">
+	        <table class="table is-hoverable">
+	       		<tr>
+	        		<th><span class="icon">
+  					<i class="fas fa-home"></i>
+					</span>Player</th>
+	        		{% for player in WeeklyStats %}
+	        			
+	        		<td><strong>{{ player[0]['playerName'] }}</strong></td>
+
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-crosshairs"></i>
+	        		</span>LastUpdate</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td class="is-size-6" style='background-size: 0% 0%'>{{ WeeklyStats[i][0]['lastUpdated']}} <br> {{BaseStats[i][0]['lastUpdated'] }}</td>
+	        		
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-crosshairs"></i>
+	        		</span>since Update</th>
+
+	        		{% for key, value in timeDiffDict.items() %}
+
+	        		<td style='background-size: 0% 0%'>{{ value }} </td>
+	        		
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	
+	        	
+	        	<tr><th><span class="icon">
+					<i class="fas fa-clock"></i>
+					</span>Play Time</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<!--{{ (WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed']) // 60,  }}-->
+	        		<td style='background-size: 0% 0%'>{{"%i:%i:%i"|format( (WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed'])//3600, (WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed']) %3600//60,(WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed'])%60)}}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-crosshairs"></i>
+	        		</span>Kills</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+	        		
+	        		<td style='background-size: 3% {{ percentDict[i]['Kills'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['Kills']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills']  }}</div></td>
+	        		
+	        		{% endfor %}
+
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-skull"></i>
+	        		</span>Deaths</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['Deaths'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['Deaths']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-skull"></i>
+	        		</span>K/D</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0%'>{{'%0.3f'| format((WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills']) / (WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']) if ((WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']) != 0) else 1 |float)}}</td>
+
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-trophy"></i>
+	        		</span>Wins</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['Wins'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['Wins']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['Wins'] - BaseStats[i][0]['Wins']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-times"></i>
+	        		</span>Losses</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['Losses'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['Losses']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['Losses'] - BaseStats[i][0]['Losses']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>Damage</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['Damage'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['Damage']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['Damage'] - BaseStats[i][0]['Damage']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>ShotsTaken</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['ShotsTaken'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['ShotsTaken']|int ~ "%" }}</div><div class="cellcontend"> {{ (WeeklyStats[i][0]['ShotsTaken'] - BaseStats[i][0]['ShotsTaken']) }}</strong class="is-size-6"></div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>ShotsHit</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['ShotsHit'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['ShotsHit']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['ShotsHit'] - BaseStats[i][0]['ShotsHit']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bullseye"></i>
+	        		</span>Accuracy</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0%'>{{'%0.2f'| format((WeeklyStats[i][0]['ShotsHit'] - BaseStats[i][0]['ShotsHit']) / (WeeklyStats[i][0]['ShotsTaken'] - BaseStats[i][0]['ShotsTaken'])*100 if ((WeeklyStats[i][0]['ShotsTaken'] - BaseStats[i][0]['ShotsTaken']) != 0) else 100|float ) ~ "%"}}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>Melee Kills</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['DogtagsTaken'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['DogtagsTaken']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['DogtagsTaken'] - BaseStats[i][0]['DogtagsTaken']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>Headshots</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['Headshots'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['Headshots']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['Headshots'] - BaseStats[i][0]['Headshots']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>Headshot %</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0%'>{{ '%0.2f'| format((WeeklyStats[i][0]['Headshots'] - BaseStats[i][0]['Headshots']) / ( WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills'] )*100) ~ "%"}}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-syringe"></i>
+	        		</span>Revives</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['Revives'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['Revives']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['Revives'] - BaseStats[i][0]['Revives']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-heartbeat"></i>
+	        		</span>RevivesRecieved</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['RevivesRecieved'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['RevivesRecieved']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['RevivesRecieved'] - BaseStats[i][0]['RevivesRecieved']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-prescription-bottle-alt"></i>
+	        		</span>Heals</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['Heals'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['Heals']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['Heals'] - BaseStats[i][0]['Heals']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-box-open"></i>
+	        		</span>Resupplies</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['Resupplies'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['Resupplies']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['Resupplies'] - BaseStats[i][0]['Resupplies']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-user"></i>
+	        		</span>Spawns</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['SquadSpawns'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['SquadSpawns']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['SquadSpawns'] - BaseStats[i][0]['SquadSpawns']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-check-square"></i>
+	        		</span>Orders</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['OrdersCompleted'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['OrdersCompleted']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['OrdersCompleted'] - BaseStats[i][0]['OrdersCompleted']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-undo-alt"></i>
+	        		</span>Rounds</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['RoundsPlayed'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['RoundsPlayed']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['RoundsPlayed'] - BaseStats[i][0]['RoundsPlayed']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	       
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-dollar-sign"></i>
+	        		</span>ScoreRound</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['ScoreRound'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['ScoreRound']|int ~ "%" }}</div><div class="cellcontend">{{ WeeklyStats[i][0]['ScoreRound'] - BaseStats[i][0]['ScoreRound']  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	    
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>ScoreCombat</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['ScoreCombat'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['ScoreCombat']|int ~ "%" }}</div><div class="cellcontend">{{ (WeeklyStats[i][0]['ScoreCombat'] - BaseStats[i][0]['ScoreCombat'])~" /"  }} {{ ('%0.1f'| format((WeeklyStats[i][0]['ScoreCombat'] - BaseStats[i][0]['ScoreCombat']) / (WeeklyStats[i][0]['ScoreRound'] - BaseStats[i][0]['ScoreRound'])*100))~"%"  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>ScoreDefensive</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['ScoreDefensive'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['ScoreDefensive']|int ~ "%" }}</div><div class="cellcontend">{{ (WeeklyStats[i][0]['ScoreDefensive'] - BaseStats[i][0]['ScoreDefensive'])~" /"  }} {{ ('%0.1f'| format((WeeklyStats[i][0]['ScoreDefensive'] - BaseStats[i][0]['ScoreDefensive']) / (WeeklyStats[i][0]['ScoreRound'] - BaseStats[i][0]['ScoreRound'])*100))~"%"  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>ScoreObjective</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['ScoreObjective'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['ScoreObjective']|int ~ "%" }}</div><div class="cellcontend">{{ (WeeklyStats[i][0]['ScoreObjective'] - BaseStats[i][0]['ScoreObjective'])~" /"  }} {{ ('%0.1f'| format((WeeklyStats[i][0]['ScoreObjective'] - BaseStats[i][0]['ScoreObjective']) / (WeeklyStats[i][0]['ScoreRound'] - BaseStats[i][0]['ScoreRound'])*100))~"%"  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>ScoreBonus</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['ScoreBonus'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['ScoreBonus']|int ~ "%" }}</div><div class="cellcontend">{{ (WeeklyStats[i][0]['ScoreBonus'] - BaseStats[i][0]['ScoreBonus'])~" /"  }} {{ ('%0.1f'| format((WeeklyStats[i][0]['ScoreBonus'] - BaseStats[i][0]['ScoreBonus']) / (WeeklyStats[i][0]['ScoreRound'] - BaseStats[i][0]['ScoreRound'])*100))~"%"  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>ScoreSquad</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['ScoreSquad'] ~ "%" }}'><div class="cellpercent" >{{ percentDict[i]['ScoreSquad']|int ~ "%" }}</div><div class="cellcontend">{{ (WeeklyStats[i][0]['ScoreSquad'] - BaseStats[i][0]['ScoreSquad'])~" /"  }} {{ ('%0.1f'| format((WeeklyStats[i][0]['ScoreSquad'] - BaseStats[i][0]['ScoreSquad']) / (WeeklyStats[i][0]['ScoreRound'] - BaseStats[i][0]['ScoreRound'])*100))~"%"  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>ScoreAward</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 3% {{ percentDict[i]['ScoreAward'] ~ "%" }} '><div class="cellpercent" >{{ percentDict[i]['ScoreAward']|int ~ "%" }}</div><div class="cellcontend">{{ (WeeklyStats[i][0]['ScoreAward'] - BaseStats[i][0]['ScoreAward'])~" /"  }} {{ ('%0.1f'| format((WeeklyStats[i][0]['ScoreAward'] - BaseStats[i][0]['ScoreAward']) / (WeeklyStats[i][0]['ScoreRound'] - BaseStats[i][0]['ScoreRound'])*100))~"%"  }}</div></td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	
+
+
+        	</table>
+        </div>
+         <div id="PerformanceStats" class="content-tab" style="display:none">
+	        <table id="PStats" class="table is-hoverable">
+	        	
+	       		<tr>
+	        		<th><span class="icon">
+  					<i class="fas fa-home"></i>
+					</span>Player</th>
+	        		{% for player in WeeklyStats %}
+	        			
+	        		<th colspan="2"><strong>{{ player[0]['playerName'] }}</strong></th>
+
+	        		{% endfor %}
+	        	</tr>
+	        	
+	        	<tr><th><span class="icon">
+					<i class="fas fa-clock"></i>
+					</span>Play Time</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<th colspan="2" style='background-size: 0% 0%'>{{"%i:%i:%i"|format( (WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed'])//3600, (WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed']) %3600//60,(WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed'])%60)}}</th>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-crosshairs"></i>
+	        		</span>Kills/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+	        		
+	        		<td style='background-size: 0% 0%'>{{ performanceDict[i]['Kills'] }}</td>
+	        		<td class="pt" style='background-size: 0% 0%'>{{ (performanceDict[i]['Kills'] * 100) |int  }}</td>
+	        		
+	        		{% endfor %}
+
+	        	</tr>
+
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-skull"></i>
+	        		</span>Deaths/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0% '>{{ performanceDict[i]['Deaths']  }}</td>
+	        		<td class="pt" style='background-size: 0% 0%'>{{ (performanceDict[i]['Deaths'] * -50) |int  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-skull"></i>
+	        		</span>K/D</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0%'>{{'%0.3f'| format((WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills']) / (WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']) if ((WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']) != 0) else 1 |float)}}</td>
+	        		<td class="pt" style='background-size: 0% 0%'>{{ ((((WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills']) / (WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']))*10 if ((WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']) != 0) else 10 )*3)|int  }}</td>
+
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-trophy"></i>
+	        		</span>W/L</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0% '>{{'%0.3f'| format(((WeeklyStats[i][0]['Wins'] - BaseStats[i][0]['Wins']) / (WeeklyStats[i][0]['Losses'] - BaseStats[i][0]['Losses'])) if ((WeeklyStats[i][0]['Losses'] - BaseStats[i][0]['Losses']) != 0) else 1 |float) }}</td>
+
+	        		<td class="pt" style='background-size: 0% 0% '>{{ ((((WeeklyStats[i][0]['Wins'] - BaseStats[i][0]['Wins']) / (WeeklyStats[i][0]['Losses'] - BaseStats[i][0]['Losses']))*20) if ((WeeklyStats[i][0]['Losses'] - BaseStats[i][0]['Losses']) != 0) else 20 )|int }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+				
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>Damage/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0%  '>{{ performanceDict[i]['Damage']  }}</td>
+	        		<td class="pt" style='background-size: 0% 0%'>{{ (performanceDict[i]['Damage']/2) |int  }}</td>
+
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>ShotsHit/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0%0%'> {{  performanceDict[i]['ShotsHit'] }}
+	        		</td>
+	        		<td class="pt" style='background-size: 0%0%'>{{ (performanceDict[i]['ShotsHit'] * 10)|int  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bullseye"></i>
+	        		</span>Accuracy</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0%'>{{'%0.2f'| format((WeeklyStats[i][0]['ShotsHit'] - BaseStats[i][0]['ShotsHit']) / (WeeklyStats[i][0]['ShotsTaken'] - BaseStats[i][0]['ShotsTaken'])*100 if ((WeeklyStats[i][0]['ShotsTaken'] - BaseStats[i][0]['ShotsTaken']) != 0) else 100|float ) ~ "%"}}</td>
+
+	        		<td class="pt" style='background-size: 0% 0%'>{{ (((WeeklyStats[i][0]['ShotsHit'] - BaseStats[i][0]['ShotsHit']) / (WeeklyStats[i][0]['ShotsTaken'] - BaseStats[i][0]['ShotsTaken']))*100 if ((WeeklyStats[i][0]['ShotsTaken'] - BaseStats[i][0]['ShotsTaken']) != 0) else 100 )|int   }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span>Melee Kills</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0% '>{{ WeeklyStats[i][0]['DogtagsTaken'] - BaseStats[i][0]['DogtagsTaken']  }}</td>
+	        		<td class="pt" style='background-size: 0% 0% '>{{ (WeeklyStats[i][0]['DogtagsTaken'] - BaseStats[i][0]['DogtagsTaken']) * 30  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>Headshots/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0%'>{{ performanceDict[i]['Headshots'] }}</td>
+	        		<td class="pt" style='background-size: 0% 0%'>{{ (performanceDict[i]['Headshots']*200)|int }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>Headshot %</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0%'>{{ '%0.2f'| format((WeeklyStats[i][0]['Headshots'] - BaseStats[i][0]['Headshots']) / ( WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills'] )*100) ~ "%"}}</td>
+
+	        		<td class="pt" style='background-size: 0% 0%'>{{ ((WeeklyStats[i][0]['Headshots'] - BaseStats[i][0]['Headshots']) / ( WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills'] )*100)|int }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-syringe"></i>
+	        		</span>Revives/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0% '>{{ performanceDict[i]['Revives']  }}</td>
+	        		<td class="pt" style='background-size: 0% 0% '>{{ (performanceDict[i]['Revives']*150) |int }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-prescription-bottle-alt"></i>
+	        		</span>Heals/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0% '>{{ performanceDict[i]['Heals']  }}</td>
+	        		<td class="pt" style='background-size: 0% 0% '>{{ (performanceDict[i]['Heals'] * 50) |int }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-box-open"></i>
+	        		</span>Resupplies/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0% '>{{ performanceDict[i]['Resupplies']  }}</td>
+	        		<td class="pt" style='background-size: 0% 0% '>{{ (performanceDict[i]['Resupplies'] * 50) |int }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-user"></i>
+	        		</span>Spawns/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0% '>{{ performanceDict[i]['SquadSpawns']  }}</td>
+	        		<td class="pt" style='background-size: 0% 0% '>{{ (performanceDict[i]['SquadSpawns'] * 100)| int }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-check-square"></i>
+	        		</span>Orders/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0% '>{{ performanceDict[i]['OrdersCompleted']  }}</td>
+	        		<td class="pt" style='background-size: 0% 0% '>{{ (performanceDict[i]['OrdersCompleted'] * 200)|int }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	
+	       
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-dollar-sign"></i>
+	        		</span>ScoreRound/m</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td style='background-size: 0% 0% '>{{ performanceDict[i]['ScoreRound'] }}</td>
+	        		<td class="pt" style='background-size: 0% 0% '>{{ (performanceDict[i]['ScoreRound']/3)|int }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-bolt"></i>
+	        		</span> SKILL</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td colspan="2" class="skill" style='background-size: 0% 0% '>0</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	
+        	</table>
+        </div>
+        <div id="Firestorm" class="content-tab" style="display:none">
+        	<table class="table">
+	       		<tr>
+	        		<th><span class="icon">
+  					<i class="fas fa-home"></i>
+					</span>Player</th>
+	        		{% for player in WeeklyFireStats %}
+	        			
+	        		<td><strong>{{ player[0]['playerName'] }}</strong></td>
+
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+					<i class="fas fa-clock"></i>
+					</span>Play Time</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{"%i:%i:%i"|format( (WeeklyFireStats[i][0]['TimePlayed'] - FireStats[i][0]['TimePlayed'])//3600, (WeeklyFireStats[i][0]['TimePlayed'] - FireStats[i][0]['TimePlayed']) %3600//60,(WeeklyFireStats[i][0]['TimePlayed'] - FireStats[i][0]['TimePlayed'])%60)}}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-crosshairs"></i>
+	        		</span>Kills</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['Kills'] - FireStats[i][0]['Kills']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-skull"></i>
+	        		</span>Downs</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['Downs'] - FireStats[i][0]['Downs']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-trophy"></i>
+	        		</span>All Wins</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['SoloWins'] + WeeklyFireStats[i][0]['SquadWins'] - FireStats[i][0]['SoloWins'] - FireStats[i][0]['SquadWins']}}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>Losses</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['MatchesPlayed'] - FireStats[i][0]['MatchesPlayed']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-syringe"></i>
+	        		</span>Revives</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['Revives'] - FireStats[i][0]['Revives']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>Headshots</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['Headshots'] - FireStats[i][0]['Headshots']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>CapturePoints</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['CapturePoints'] - FireStats[i][0]['CapturePoints']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>Healing</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['Healing'] - FireStats[i][0]['Healing']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>Safes</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['Safes'] - FireStats[i][0]['Safes']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>SupplyDrops</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['SupplyDrops'] - FireStats[i][0]['SupplyDrops']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        		<tr><th><span class="icon">
+  					<i class="fas fa-user-alt-slash"></i>
+	        		</span>VehiclesDestroyed</th>
+	        		{% for i in range(0, WeeklyFireStats|length) %}
+
+	        		<td>{{ WeeklyFireStats[i][0]['VehiclesDestroyed'] - FireStats[i][0]['VehiclesDestroyed']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+        	</table>
+        </div>
+        
+   		
+        </div>
+    </section>
+    <footer class="footer">
+	  <div class="content has-text-centered">
+	    <p>
+	      <strong>Battlefield V Weekly Stats</strong> by Marcus Loeper.
+	    </p>
+	  </div>
+	</footer>
+    </body>
+</html>
+

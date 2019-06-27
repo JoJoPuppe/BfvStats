@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  	</head>
+    <body>
+    <section class="section">
+        <h1>Hello, {{ user.username }}!</h1>
+        <div class="container">
+        <div class="columns">
+        <h1 class="h1">{{ TableBody['playerName']|e }}</h1>
+        <table class="table">
+	        	<tr>
+	        		<th>Player</th>
+	        		{% for record in TableBody %}
+	        		<td>{{ record['playerName'] |e }}</td>
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Play Time</th>
+	        		{% for record in TableBody %}
+	        		<td>{{ record['TimePlayed'] |e }}</td>
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Wins</th>
+	        		{% for record in TableBody %}
+	        		<td>{{ record['Wins'] |e }}</td>
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Losses</th>
+	        		{% for record in TableBody %}
+	        		<td>{{ record['Losses'] |e }}</td>
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Kills</th>
+	        		{% for record in TableBody %}
+	        		<td>{{ record['Kills'] |e }}</td>
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Deaths</th>
+	        		{% for record in TableBody %}
+	        		<td>{{ record['Deaths'] |e }}</td>
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>K/D</th>
+	        		{% for record in TableBody %}
+	        		<td>{{'%0.3f'| format(record['KdRatio']|float)}}</td>
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Damage</th>
+	        		{% for record in TableBody %}
+	        		<td>{{ record['Damage'] |e }}</td>
+	        		{% endfor %}
+	        	</tr>
+        </table>
+   		</div>
+        </div>
+    </section>
+     <section class="section">
+
+        <div class="columns">
+        <h1 class="h1">{{ WeeklyStats[0]['playerName']|e }}</h1>
+        <table class="table">
+       <tr>
+	        		<th>Player</th>
+	        		{% for player in WeeklyStats %}
+	        			
+	        		<td>{{ player[0]['playerName'] }}</td>
+
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Play Time</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['TimePlayed'] - BaseStats[i][0]['TimePlayed']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Kills</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Deaths</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Wins</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['Wins'] - BaseStats[i][0]['Wins']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Losses</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['Losses'] - BaseStats[i][0]['Losses']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Damage</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['Damage'] - BaseStats[i][0]['Damage']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+        </table>
+        
+   		
+        </div>
+    </section>
+    </body>
+</html>
+

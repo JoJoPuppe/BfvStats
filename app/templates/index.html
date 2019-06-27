@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hello Bulma!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  </head>
+    <body>
+    <section class="section">
+        <h1>Hello, {{ user.username }}!</h1>
+        <div class="container">
+        <div class="columns">
+        <table class="table">
+	        <thead>
+	        	<tr>
+	        	{% for data in TableHeader %}
+	        	
+	        		<th>{{ data|e }}</th>
+	        	
+	        	{% endfor %}
+	        	</tr>
+	        </thead>
+	        <tbody>
+	        	{% for record in TableBody %}
+	        	<tr>
+	        		{% for column in TableHeader %}
+		        	
+		        		<td>{{ record[column] |e }}</td>
+		        	
+		        	{% endfor %}
+		        </tr>
+	        	{% endfor %}
+        	</tbody>
+        </table>
+   		</div>
+        </div>
+    </section>
+    </body>
+</html>
+

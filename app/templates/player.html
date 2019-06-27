@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Player Stats</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.5/css/bulma.min.css">
+    <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  	</head>
+    <body>
+    <section class="section">
+    	<div class="container">
+	      	<h1 class="title">Daily BFV Stats</h1>
+	      	<h2 class="subtitle">
+	        		See your daily Stats of week <strong>{{currentWeek}}</strong>
+	      	</h2>
+	        
+	        <table class="table">
+	       		<tr>
+	        		<th><span class="icon">
+  					<i class="fas fa-home"></i>
+					</span>StatsUpdate</th>
+	        		{% for record in dailyStats %}
+	        			
+	        		<td>{{ record['lastUpdated'] }}</td>
+
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Play Time</th>
+	        		{% for record in dailyStats %}
+	        			
+	        		<td>{{ record['TimePlayed'] }}</td>
+
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Kills</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['Kills'] - BaseStats[i][0]['Kills']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Deaths</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['Deaths'] - BaseStats[i][0]['Deaths']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Wins</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['Wins'] - BaseStats[i][0]['Wins']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Losses</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['Losses'] - BaseStats[i][0]['Losses']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+	        	<tr>
+	        		<th>Damage</th>
+	        		{% for i in range(0, WeeklyStats|length) %}
+
+	        		<td>{{ WeeklyStats[i][0]['Damage'] - BaseStats[i][0]['Damage']  }}</td>
+	        		
+	        		{% endfor %}
+	        	</tr>
+        	</table>
+        
+   		
+        </div>
+    </section>
+    <footer class="footer">
+	  <div class="content has-text-centered">
+	    <p>
+	      <strong>Battlefield V Weekly Stats</strong> by Marcus Loeper.
+	    </p>
+	  </div>
+	</footer>
+    </body>
+</html>
+
