@@ -20,7 +20,8 @@ import pytz
 def index():
 	user = {'username': 'Miguel'}
 	#StatsTable = db.session.query(PlayerStatsTable).all()
-	StatsTable = PlayerStatsTable.query.all()
+	#StatsTable = PlayerStatsTable.query.all()
+	StatsTable = db.session.query(PlayerStatsTable).filter(PlayerStatsTable.playerName == 'jojopuppe').all()
 	StatsTable_dict = dict((col, getattr(PlayerStatsTable, col)) for col in PlayerStatsTable.__table__.columns.keys())
 
 	return render_template('index.html', title='Home', user=user, TableBody=StatsTable, TableHeader = StatsTable_dict)
@@ -82,7 +83,6 @@ def week():
 		currentTime = datetime.strptime(timestr, '%Y-%m-%dT%H:%M:%SZ')
 		timeSinceUpdate = datetime.strptime(timestr2, '%Y-%m-%dT%H:%M:%SZ')
 		timeDiff = (currentTime-timeSinceUpdate).total_seconds()
-		print(timeDiff)
 		hours, seconds = timeDiff // 3600, timeDiff%3600
 		minutes = seconds // 60
 		timeDiffString = str(int(hours)) + "h:" + str(int(minutes)) + "m"
@@ -92,6 +92,8 @@ def week():
 		timeSinceUpdate += offset
 		WeeklyStats[i][0].lastUpdated = currentTime.strftime('%d-%m/%H:%M')
 		BaseStats[i][0].lastUpdated = timeSinceUpdate.strftime('%d-%m/%H:%M')
+
+
 		
 	performanceDict = []
 	percentDict = []
@@ -104,7 +106,6 @@ def week():
 			weeklyPercent = []
 
 			for i in range(0,len(WeeklyStats)):
-				
 
 				diff = getattr(WeeklyStats[i][0],key) - getattr(BaseStats[i][0],key)
 			
@@ -117,54 +118,158 @@ def week():
 
 				percentDict[j][key] = percent(weeklyPercent[j], maxVal)
 				performanceDict[j][key] = performancePerMin(diffTime, weeklyPercent[j])
-		else:
-			print("no int or float")
-				
+
+
+	
+	weeklyPercent = []
+	for j in range(0,len(WeeklyStats)):
+
+		if (WeeklyStats[j][0].ShotsTaken - BaseStats[j][0].ShotsTaken):
+			
+			weeklyPercent.append((WeeklyStats[j][0].ShotsHit - BaseStats[j][0].ShotsHit) / (WeeklyStats[j][0].ShotsTaken - BaseStats[j][0].ShotsTaken) * 100)
+			
+	maxVal = max(weeklyPercent)
+
+	for j in range(0,len(WeeklyStats)):
+		percentDict[j]['Acc'] = percent(weeklyPercent[j], maxVal)
+
+
+
+	weeklyPercent = []
+	for j in range(0,len(WeeklyStats)):
+
+		if (WeeklyStats[j][0].Kills - BaseStats[j][0].Kills):
+			
+			weeklyPercent.append((WeeklyStats[j][0].Headshots - BaseStats[j][0].Headshots) / (WeeklyStats[j][0].Kills - BaseStats[j][0].Kills) * 100)
+			
+	maxVal = max(weeklyPercent)
+
+	for j in range(0,len(WeeklyStats)):
+		percentDict[j]['HeadPercent'] = percent(weeklyPercent[j], maxVal)
+
+
+
+	weeklyPercent = []
+	for j in range(0,len(WeeklyStats)):
+
+		if (WeeklyStats[j][0].Deaths - BaseStats[j][0].Deaths):
+			
+			weeklyPercent.append((WeeklyStats[j][0].Kills - BaseStats[j][0].Kills) / (WeeklyStats[j][0].Deaths - BaseStats[j][0].Deaths))
+			
+	maxVal = max(weeklyPercent)
 	
 
-	print(performanceDict)
+	for j in range(0,len(WeeklyStats)):
+		percentDict[j]['KD'] = percent(weeklyPercent[j], maxVal)
 
-		
-
-
-	#arrNew = {}
-
-	#maxVal = max(arr.values())
-
-	#for key, value in arr.items():
-	#    arrNew[key] = round((value / maxVal * 100),2)
-	
-	
 
 
 	return render_template('week.html', WeeklyStats = WeeklyStats, BaseStats=BaseStats, WeeklyFireStats=WeeklyFireStats, FireStats=FireStats, WeekStartEnd=WeekStartEnd, timeDiffDict=timeDiffDict, percentDict=percentDict, performanceDict=performanceDict)
 
 @app.route("/playerstats/<player>")
-def player():
+def playerStats(player):
+
+	def statsDiff(baseDay, nextDay):
+
+		dayDiff = {}
+
+		if(baseDay) != 0:
+			for key, value in nextDay.__dict__.items():
+				if type(value) is (int or float):
+					dayDiff[key] = value - getattr(baseDay,key)
+
+			return dayDiff
+		else:
+			return 0
+
+	def convertTime(stringTime):
+		return datetime.strptime(stringTime, '%Y-%m-%dT%H:%M:%SZ')
+
+		
+
+
+
 
 	currentWeek = datetime.today().strftime("%V")
 	lastWeek = str(int(currentWeek)-1)
 
-	dailyStats = db.session.query(PlayerStatsTable).filter(PlayerStatsTable.playerName == player, PlayerStatsTable.KW == currentWeek).order_by(PlayerStatsTable.id.desc()).all()
-	#lastWeekStats = db.session.query(PlayerStatsTable, func.max(PlayerStatsTable.TimePlayed)).filter(PlayerStatsTable.KW == lastWeek).group_by(PlayerStatsTable.playerName).order_by(collate(PlayerStatsTable.playerName, 'NOCASE'),PlayerStatsTable.id.desc()).all()
+	firstDayOfWeek = datetime.today()
 
-	#BaseStats = [];
+	start = firstDayOfWeek - timedelta(days=firstDayOfWeek.weekday())
+	end = start + timedelta(days=6)
 
-	#for i in range(0,len(WeeklyStats)):
-	#	for j in range(0,len(lastWeekStats)):
-	#		if WeeklyStats[i][0].playerName == lastWeekStats[j][0].playerName:
-	#			BaseStats.append(lastWeekStats[j])
-	#	if len(BaseStats) != (i+1):
-	#		lastCurrentWeekStat = db.session.query(PlayerStatsTable, func.min(PlayerStatsTable.TimePlayed)).filter(PlayerStatsTable.playerName == WeeklyStats[i][0].playerName ,PlayerStatsTable.KW == currentWeek).group_by(PlayerStatsTable.playerName).first()
-	#		BaseStats.append(lastCurrentWeekStat)
+	WeekStartEnd = [start.strftime('%d-%b-%Y'), end.strftime('%d-%b-%Y')]
 
-	#print(WeeklyStats)
-	#print(BaseStats)
+	DailyPlayerStats = db.session.query(PlayerStatsTable).filter(PlayerStatsTable.playerName == player, PlayerStatsTable.KW == currentWeek).order_by(PlayerStatsTable.id).all()
+	lastWeekStat = db.session.query(PlayerStatsTable).filter(PlayerStatsTable.playerName == player, PlayerStatsTable.KW == lastWeek).order_by(PlayerStatsTable.id.desc()).first()
+	
+	AllDailyStats =  [lastWeekStat] + DailyPlayerStats
+
+	for i in range(0, len(AllDailyStats)):
+		print(AllDailyStats[i].Kills)
+
+	
+
+	#print(timeCheck.strftime('%d-%b-%Y:%H:%M:%s'))
+	
+	DayDiffStats = []
+	lastStatUpdate = 0
+	for i in range(0, firstDayOfWeek.weekday()):
+
+		timeCheck = firstDayOfWeek.replace(hour=6, minute=00) - timedelta(days=firstDayOfWeek.weekday() - i)
+
+		for j in range(0, len(AllDailyStats)-1):
+
+			#updateTime = convertTime(AllDailyStats[j].lastUpdated)
+			updateTime = AllDailyStats[j].TimeStamp
+			
+
+			if((updateTime < timeCheck) and (i < 1)):
+				print("first stat")
+
+				diffStat = statsDiff(AllDailyStats[lastStatUpdate], AllDailyStats[j+1])
+				if(diffStat != 0):
+					DayDiffStats.append(diffStat)
+					lastStatUpdate += 1
+
+			elif(updateTime.weekday() == (timeCheck.weekday()-1)):
+
+				
+
+				#nextUpdate = convertTime(AllDailyStats[j+1].lastUpdated)
+				nextUpdate = AllDailyStats[j+1].TimeStamp
+
+				if(nextUpdate.weekday() > updateTime.weekday()):
+					print(updateTime)
+					print(":")
+					print(timeCheck)
+
+					diffStat = statsDiff(AllDailyStats[lastStatUpdate], AllDailyStats[j+1])
+					if(diffStat != 0):
+						DayDiffStats.append(diffStat)
+				else:
+					lastStatUpdate += 1
+					print("same day but earlier")
 
 
-	#StatsTable_dict = dict((col, getattr(PlayerStatsTable, col)) for col in PlayerStatsTable.__table__.columns.keys())
+	print(len(DayDiffStats))
 
-	return render_template('player.html', dailyStats=dailyStats, currentWeek=currentWeek)
+
+
+
+
+
+
+	#WeeklyFireStats = db.session.query(FireStormTable, func.max(FireStormTable.TimeStamp)).filter(FireStormTable.KW == currentWeek).group_by(FireStormTable.playerName).order_by(collate(FireStormTable.playerName, 'NOCASE'),FireStormTable.id.desc()).all()
+	#lastWeekFireStats = db.session.query(FireStormTable, func.max(FireStormTable.TimeStamp)).filter(FireStormTable.KW == lastWeek).group_by(FireStormTable.playerName).order_by(collate(FireStormTable.playerName, 'NOCASE'),FireStormTable.id.desc()).all()
+
+
+
+
+
+
+	return render_template('player.html', DayDiffStats=DayDiffStats, currentWeek=currentWeek, WeekStartEnd=WeekStartEnd)
+	#return "<h1>"+player+"</h1>"
 
 
 
